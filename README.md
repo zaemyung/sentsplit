@@ -19,6 +19,8 @@ pip install sentsplit
 pip install git+https://github.com/zaemyung/sentsplit
 ```
 
+Uses [python-crfsuite](https://github.com/scrapinghub/python-crfsuite), which, in turn, is built upon [CRFsuite](https://github.com/chokkan/crfsuite).
+
 ## Segmentation
 ### CLI
 ```bash
