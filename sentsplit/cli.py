@@ -1,11 +1,13 @@
-from argparse import Namespace
 import os
 import pprint
+import subprocess
 import sys
+from argparse import Namespace
 from copy import deepcopy
 from datetime import datetime
 
 from loguru import logger
+from tqdm import tqdm
 
 from sentsplit import config
 from sentsplit.segment import SentSplit
@@ -53,14 +55,16 @@ def sentsplit_segment(args: Namespace) -> None:
             default_config[k] = override_options[k]
 
     sentsplit = SentSplit(lang, **default_config)
+
+    num_lines = int(subprocess.check_output(['wc', '-l', input_file]).decode('utf8').split()[0])
     with open(input_file, 'r') as inf, open(output_file, 'w') as outf:
         cnt = 0
-        for index, line in enumerate(inf, start=1):
+        for line in tqdm(inf, total=num_lines):
             line = line.rstrip('\n')
             segments = sentsplit.segment(line)
             for segment in segments:
                 outf.write(f"{segment}\n")
-                cnt += 1
+            cnt += len(segments)
 
-        logger.info(f"{index} lines are segmented into {cnt} sentences, and saved at {output_file}")
+        logger.info(f"{num_lines} lines are segmented into {cnt} sentences, and saved at {output_file}")
     sentsplit.close()
