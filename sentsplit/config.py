@@ -36,7 +36,7 @@ ja_config['prevent_word_split'] = False
 ja_config['mincut'] = 5
 
 ko_config = deepcopy(base_config)
-ko_config['model'] = 'crf_models/ko-default-25032021.model'
+ko_config['model'] = 'crf_models/ko-default-27032021.model'
 ko_config['mincut'] = 5
 
 lt_config = deepcopy(base_config)
