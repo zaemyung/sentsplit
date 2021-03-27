@@ -56,6 +56,7 @@ def main(*args: str) -> None:
     subparser_segment.add_argument('--prevent_regexes', nargs='?', type=json.loads,
                                    help='do not segment at characters that are matched by `prevent_regexes` regex(es) in JSON;'\
                                         'e.g. \'[{"name": "custom", "regex": "\\\\.["\\\\\'”] "}]\'')
+    subparser_segment.add_argument('--cores', type=int, default=1, help='number of CPU cores to use; default is 1 (single core)')
     subparser_segment.set_defaults(func=sentsplit.cli.sentsplit_segment)
 
     args = parser.parse_args()
