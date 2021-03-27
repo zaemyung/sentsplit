@@ -12,6 +12,7 @@ base_config = {
     ],
     'prevent_regexes': [
         {'name': 'liberal_url'},
+        {'name': 'period_followed_by_lowercase'},
     ],
     'handle_multiple_spaces': True,
     'prevent_word_split': True,
