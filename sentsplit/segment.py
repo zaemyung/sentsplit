@@ -2,7 +2,6 @@ import math
 import os
 import pprint
 import re
-import sys
 from copy import deepcopy
 from typing import Any, Dict, List, Tuple, Union
 
@@ -256,12 +255,15 @@ class SentSplit():
             if len(sent) <= mincut:
                 if not is_leftover:
                     return False
-                # It is a leftover, but if an empty string, then don't add
+                # if it is a leftover, but also an empty string, then don't add
                 elif len(sent) <= 0:
                     return False
             if strip_spaces:
                 sent = sent.strip()
             if len(sent) <= 0:
+                return False
+            # if the no. of remaining characters are less than mincut, don't add
+            if not is_leftover and string_length - current_index <= mincut:
                 return False
             results.append(sent)
             return True
@@ -269,7 +271,8 @@ class SentSplit():
         results = []
         for char_string, tags in zip(chars_strings, y_tags_strings):
             sentence = ''
-            for current_character, tag in zip(char_string, tags):
+            string_length = len(char_string)
+            for current_index, (current_character, tag) in enumerate(zip(char_string, tags)):
                 if len(sentence) >= maxcut:
                     if _check_and_add_sentence(sentence):
                         sentence = ''
