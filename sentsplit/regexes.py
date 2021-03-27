@@ -9,7 +9,7 @@ newline = {
 
 ellipsis = {
     'name': 'ellipsis',
-    'regex': r'…',
+    'regex': r'…(?![\!\?\.．？！])',
     'at': 'end'
 }
 
