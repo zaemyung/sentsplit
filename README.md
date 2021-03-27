@@ -63,6 +63,26 @@ Segmentation is performed by first applying a trained CRF model to a line, where
 
 Note that `prevent_regexes` is applied *after* `segment_regexes`, meaning that the segmentation positions captured by `segment_regexes` can be *overridden* by `prevent_regexes`.
 
+### An Example
+Let's suppose we want to segment sentences that end with a tilde (`~` or `〜`) which is often used in some East Asian countries to convey a sense of friendliness, silliness, whimsy or flirtatiousness.
+We can devise a regex that looks something like this: `(?<=[다요])~+(?= )`, where `다` and `요` are the most common characters that finish the sentences in the polite/formal form.
+This regex can be added to `segment_regexes` to take effect:
+```python
+from copy import deepcopy
+from sentsplit.config import ko_config
+from sentsplit.segment import SentSplit
+
+my_config = deepcopy(ko_config)
+my_config['segment_regexes'].append({'name': 'tilde_ending', 'regex': r'(?<=[다요])~+(?= )', 'at': 'end'})
+sent_splitter = SentSplit('ko', **my_config)
+
+sent_splitter.segment('안녕하세요~ 만나서 정말 반갑습니다~~ 잘 부탁드립니다!')
+
+# results with the regex: ['안녕하세요~', ' 만나서 정말 반갑습니다~~', ' 잘 부탁드립니다!']
+# results without the regex: ['안녕하세요~ 만나서 정말 반갑습니다~~ 잘 부탁드립니다!']
+```
+To learn more about the regular expressions, this [website](https://www.regular-expressions.info/tutorial.html) provides a good tutorial.
+
 ## Creating a New SentSplit Model
 Creating a new model involves first training a CRF model on a dataset of clean sentences, followed by (optionally) adding or modifying the feature arguments for better performance.
 

@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from .utils import read_lines
 
-_PUNCTUATIONS = {'.', '?', '!', '\"', '\'', '”', '．', '？', '！', '。'}
+_PUNCTUATIONS = {'.', '?', '!', '\"', '\'', '”', '．', '？', '！', '。', '…'}
 
 
 def train_crf_model(corpus_path: str, ngram: int, output_path: str, sample_min_length: int,

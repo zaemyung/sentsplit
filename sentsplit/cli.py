@@ -5,6 +5,8 @@ import sys
 from argparse import Namespace
 from copy import deepcopy
 from datetime import datetime
+from multiprocessing import Pool
+from typing import List
 
 from loguru import logger
 from tqdm import tqdm
@@ -12,6 +14,7 @@ from tqdm import tqdm
 from sentsplit import config
 from sentsplit.segment import SentSplit
 from sentsplit.train import train_crf_model
+from sentsplit.utils import write_lines
 
 
 def sentsplit_train(args: Namespace) -> None:
@@ -35,6 +38,10 @@ def sentsplit_train(args: Namespace) -> None:
     train_crf_model(corpus_path, ngram, output_path, sample_min_length, crf_max_iteration, add_depunctuated_samples, add_despaced_samples)
 
 
+def call_sentsplit_batch(line: str) -> List[str]:
+    return sentsplit.segment(line.rstrip('\n'))
+
+
 def sentsplit_segment(args: Namespace) -> None:
     lang = args.lang
     input_file = args.input
@@ -44,6 +51,8 @@ def sentsplit_segment(args: Namespace) -> None:
         output_file = f'{input_file}.segment'
 
     override_options = vars(args)
+    cores = override_options['cores']
+    del override_options['cores']
     try:
         default_config = deepcopy(getattr(config, '{}_config'.format(lang)))
     except AttributeError:
@@ -54,17 +63,25 @@ def sentsplit_segment(args: Namespace) -> None:
         if override_options[k] is not None:
             default_config[k] = override_options[k]
 
+    global sentsplit
     sentsplit = SentSplit(lang, **default_config)
 
     num_lines = int(subprocess.check_output(['wc', '-l', input_file]).decode('utf8').split()[0])
     with open(input_file, 'r') as inf, open(output_file, 'w') as outf:
         cnt = 0
-        for line in tqdm(inf, total=num_lines):
-            line = line.rstrip('\n')
-            segments = sentsplit.segment(line)
-            for segment in segments:
-                outf.write(f"{segment}\n")
-            cnt += len(segments)
+        if cores <= 1:
+            for line in tqdm(inf, total=num_lines):
+                line = line.rstrip('\n')
+                segments = sentsplit.segment(line)
+                for segment in segments:
+                    outf.write(f"{segment}\n")
+                cnt += len(segments)
+        else:
+            with Pool(processes=cores) as p:
+                pooled_results = list(tqdm(p.imap(call_sentsplit_batch, inf, chunksize=700), total=num_lines))
+            sentences = [item for sublist in pooled_results for item in sublist]
+            cnt = len(sentences)
+            write_lines(sentences, output_file)
 
         logger.info(f"{num_lines} lines are segmented into {cnt} sentences, and saved at {output_file}")
     sentsplit.close()

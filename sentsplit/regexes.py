@@ -9,7 +9,7 @@ newline = {
 
 ellipsis = {
     'name': 'ellipsis',
-    'regex': r'…',
+    'regex': r'…(?![\!\?\.．？！])',
     'at': 'end'
 }
 
@@ -27,4 +27,9 @@ liberal_url = {
     # ref. https://gist.github.com/gruber/249502#gistcomment-1328838
     'name': 'liberal_url',
     'regex': r'\b((?:[a-z][\w\-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]|\((?:[^\s()<>]|(?:\([^\s()<>]+\)))*\))+(?:\((?:[^\s()<>]|(?:\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?«»“”‘’]))'
+}
+
+period_followed_by_lowercase = {
+    'name': 'period_followed_by_lowercase',
+    'regex': r'\.(?= *[a-z])'
 }
