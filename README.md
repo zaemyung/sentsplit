@@ -111,3 +111,25 @@ from sentsplit.segment import SentSplit
 
 sent_splitter = SentSplit(lang_code, model='path/to/model', ...)
 ```
+
+## Supported Languages
+Currently supported languages are:
+- English (`en`)
+- French (`fr`)
+- German (`de`)
+- Italian (`it`)
+- Japanese (`ja`)
+- Korean (`ko`)
+- Lithuanian (`lt`)
+- Polish (`pl`)
+- Portuguese (`pt`)
+- Russian (`ru`)
+- Simplified Chinese (`zh`)
+- Turkish (`tr`)
+
+Please note that many of these languages are trained with openly available sentences gathered from bilingual corpora for machine translations.
+The training sentences for European languages are mostly from the [Europarl](https://www.statmt.org/europarl/) corpora, so the default models may not handle colloquial sentences effectively.
+We can either train a new CRF model with more gold sentences from the target domain, or devise domain-specific regex rules if need be.
+
+## License
+`sentsplit` is licensed under MIT license, as found in [LICENSE](https://github.com/zaemyung/sentsplit/blob/main/LICENSE) file.
