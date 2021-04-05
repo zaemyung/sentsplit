@@ -31,12 +31,12 @@ it_config = deepcopy(base_config)
 it_config['model'] = 'crf_models/it-default-25032021.model'
 
 ja_config = deepcopy(base_config)
-ja_config['model'] = 'crf_models/ja-default-20210405.model'
+ja_config['model'] = 'crf_models/ja-default-05042021.model'
 ja_config['prevent_word_split'] = False
 ja_config['mincut'] = 5
 
 ko_config = deepcopy(base_config)
-ko_config['model'] = 'crf_models/ko-default-20210405.model'
+ko_config['model'] = 'crf_models/ko-default-05042021.model'
 ko_config['mincut'] = 5
 
 lt_config = deepcopy(base_config)
@@ -55,6 +55,6 @@ tr_config = deepcopy(base_config)
 tr_config['model'] = 'crf_models/tr-default-25032021.model'
 
 zh_config = deepcopy(base_config)
-zh_config['model'] = 'crf_models/zh-default-20210405.model'
+zh_config['model'] = 'crf_models/zh-default-05042021.model'
 zh_config['prevent_word_split'] = False
 zh_config['mincut'] = 5
