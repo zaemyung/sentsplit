@@ -34,7 +34,7 @@ def sentsplit_train(args: Namespace) -> None:
 
     if output_path is None:
         corpus_basename = os.path.basename(corpus_path)
-        today_str = datetime.today().strftime('%Y%m%d')
+        today_str = datetime.today().strftime('%d%m%Y')
         output_path = f'./{corpus_basename}.{lang}-{ngram}-gram-{today_str}.model'
 
     train_crf_model(corpus_path, ngram, output_path, sample_min_length, crf_max_iteration, depunctuation_ratio, num_depunctuation_endings, ending_length, despace_ratio)
