@@ -24,8 +24,10 @@ def sentsplit_train(args: Namespace) -> None:
     output_path = args.output
     sample_min_length = args.sample_min_length
     crf_max_iteration = args.crf_max_iteration
-    add_depunctuated_samples = args.add_depunctuated_samples
-    add_despaced_samples = args.add_despaced_samples
+    depunctuation_ratio = args.depunctuation_ratio
+    num_depunctuation_endings = args.num_depunctuation_endings
+    ending_length = args.ending_length
+    despace_ratio = args.despace_ratio
 
     args_string = pprint.pformat(vars(args), indent=2)
     logger.info(f"Training a new CRF model:\n{args_string}")
@@ -35,7 +37,7 @@ def sentsplit_train(args: Namespace) -> None:
         today_str = datetime.today().strftime('%Y%m%d')
         output_path = f'./{corpus_basename}.{lang}-{ngram}-gram-{today_str}.model'
 
-    train_crf_model(corpus_path, ngram, output_path, sample_min_length, crf_max_iteration, add_depunctuated_samples, add_despaced_samples)
+    train_crf_model(corpus_path, ngram, output_path, sample_min_length, crf_max_iteration, depunctuation_ratio, num_depunctuation_endings, ending_length, despace_ratio)
 
 
 def call_sentsplit_batch(line: str) -> List[str]:

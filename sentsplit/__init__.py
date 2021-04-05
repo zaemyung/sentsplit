@@ -19,17 +19,22 @@ def main(*args: str) -> None:
 
     # train a new CRF model
     subparser_train = subparsers.add_parser('train', help='train a new CRF model')
-    subparser_train.add_argument('-l', '--lang', required=True, help='ISO language code, e.g. "ko", "en"')
+    subparser_train.add_argument('-l', '--lang', required=True, help='ISO language code, e.g. "ko" for Korean, "en" for English')
     subparser_train.add_argument('-c', '--corpus', required=True, help='path to input corpus file, where one line is one sentence')
     subparser_train.add_argument('-n', '--ngram', type=int, default=5, help='maximum ngram features for CRF model')
     subparser_train.add_argument('-o', '--output', type=str, help='path to output CRF model')
     subparser_train.add_argument('--sample_min_length', type=int, default=450, help='minimum number of characters of an input sample for CRF model')
     subparser_train.add_argument('--crf_max_iteration', type=int, default=50, help='maximum number of CRF iteration for training')
-    subparser_train.add_argument('--add_depunctuated_samples', action='store_true',
-                                 help='add training samples with no puctuation only appropriate for certain languages '\
-                                      '(e.g. "ko", "ja") that have specfic endings for sentences')
-    subparser_train.add_argument('--add_despaced_samples', action='store_true',
-                                 help='add training samples that consist of concatenated sentences without whitespaces among the sentences')
+    subparser_train.add_argument('--depunctuation_ratio', type=float, default=0.0,
+                                 help='ratio of training samples with no punctuation; only appropriate for certain languages '\
+                                      '(e.g. "ko", "ja") that have specific endings for sentences; '\
+                                      'top-`num_depunctuation_endings` most common endings are computed from `corpus`; '\
+                                      '1.0 means 100%% of the samples are depunctuated')
+    subparser_train.add_argument('--num_depunctuation_endings', type=int, default=100, help='number of sentence endings to extract and use')
+    subparser_train.add_argument('--ending_length', type=int, default=3, help='length of a sentence ending counted from reverse, excluding any punctuation')
+    subparser_train.add_argument('--despace_ratio', type=float, default=0.0,
+                                 help='ratio of training samples without whitespaces inbetween the sentences; '\
+                                      '1.0 means 100%% of the samples are despaced')
     subparser_train.set_defaults(func=sentsplit.cli.sentsplit_train)
 
     # segment a given text file
@@ -39,7 +44,7 @@ def main(*args: str) -> None:
     subparser_segment.add_argument('-l', '--lang', required=True, help='ISO language code, e.g. "ko", "en"')
     subparser_segment.add_argument('-i', '--input', required=True, help='path to input file to segment')
     subparser_segment.add_argument('-o', '--output', help='path to output file, default is `{input}.split`')
-    subparser_segment.add_argument('--model', help='path to the CRF model')
+    subparser_segment.add_argument('-m', '--model', help='path to the CRF model')
     subparser_segment.add_argument('--ngram', type=int, help='maximum ngram for both training and segmentation')
     subparser_segment.add_argument('--mincut', type=int, help='does not segment a line if its character length is shorter than the mincut')
     subparser_segment.add_argument('--maxcut', type=int, help='segment a line if its character length exceeds the maxcut')
