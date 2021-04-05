@@ -99,8 +99,14 @@ The following arguments are used to set the training setting:
 - `ngram`: maximum ngram features used for CRF model; default is `5`.
 - `crf_max_iteration`: maximum number of CRF iteration for training; default is `50`.
 - `sample_min_length`: when preparing an input sample for CRF model, gold sentences are concatenated to form a longer sample with a length greater than `sample_min_length`; default is `450`.
-- `add_depunctuated_samples`: when set to `True`, randomly (30% chance) remove the punctuation of the current sentence before concatenation; default is `False`. May only be suitable for languages (e.g. Korean, Japanese) that have specific endings for sentences.
-- `add_despaced_samples`: when set to `True`, with 35% chance, current sentence is concatenated to input sample without a prepending white space; default is `False`.
+- `depunctuation_ratio`: ratio of training samples with no punctuation inbetween the sentences.
+May only be suitable for certain languages (e.g. "ko", "ja") that have specific endings for sentences.
+The top-`num_depunctuation_endings` most common endings are computed from `corpus`.
+1.0 means 100% of the training samples are depunctuated.
+- `num_depunctuation_endings`: number of most common sentence endings to extract and use.
+- `ending_length`: length of sentence endings counted from reverse, exclusing any punctuation.
+- `despace_ratio`: ratio of training samples without whitespaces inbetween the sentences.
+1.0 means 100% of the training samples are despaced. For languages that do not often use whitespaces, set this to a high value ~1.0.
 
 ### Setting Configuration
 Refer to the `base_config` in `config.py`. Append a new config to the file, adjusting the arguments accordingly if needed.
@@ -111,3 +117,25 @@ from sentsplit.segment import SentSplit
 
 sent_splitter = SentSplit(lang_code, model='path/to/model', ...)
 ```
+
+## Supported Languages
+Currently supported languages are:
+- English (`en`)
+- French (`fr`)
+- German (`de`)
+- Italian (`it`)
+- Japanese (`ja`)
+- Korean (`ko`)
+- Lithuanian (`lt`)
+- Polish (`pl`)
+- Portuguese (`pt`)
+- Russian (`ru`)
+- Simplified Chinese (`zh`)
+- Turkish (`tr`)
+
+Please note that many of these languages are trained with openly available sentences gathered from bilingual corpora for machine translations.
+The training sentences for European languages are mostly from the [Europarl](https://www.statmt.org/europarl/) corpora, so the default models may not handle colloquial sentences effectively.
+We can either train a new CRF model with more gold sentences from the target domain, or devise a set of domain-specific regex rules if need be.
+
+## License
+`sentsplit` is licensed under MIT license, as found in [LICENSE](https://github.com/zaemyung/sentsplit/blob/main/LICENSE) file.
