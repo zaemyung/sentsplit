@@ -1,6 +1,7 @@
-import re
 from functools import reduce
 from typing import List
+
+import regex as re
 
 
 def read_lines(file_path: str) -> List[str]:
