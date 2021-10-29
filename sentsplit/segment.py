@@ -263,7 +263,7 @@ class SentSplit():
             if len(sent) <= 0:
                 return False
             # if the no. of remaining characters are less than mincut, don't add
-            if not is_leftover and str_len - cur_ind <= mincut:
+            if not is_leftover and (str_len - cur_ind) <= mincut:
                 return False
             results.append(sent)
             return True
@@ -271,6 +271,8 @@ class SentSplit():
         def _segment_maxcut_string(sent: str) -> str:
             '''
             Heuristically segment a maxcut string into two, add the first half to `results`, and return the remaining half.
+            A list of heuristic regexes are applied to `sent` in decreasing order of importance.
+            As soon as a matching is found, the sentence is segmented.
             '''
             rgx_punctuation_and_closing = r'(?<=[\.。︀?？!！…])[\'"’”❜❞›»❯」』)）\]］】〟]'
             rgx_closing_and_punctuation = r'(?<=[\'"’”❜❞›»❯」』)）\]］】〟])[\.。︀?？!！…]'
