@@ -1,12 +1,12 @@
 import math
 import os
 import pprint
-import re
 from copy import deepcopy
 from typing import Any, Dict, List, Tuple, Union
 
 import pkg_resources
 import pycrfsuite
+import regex as re
 from loguru import logger
 
 from . import config, regexes
@@ -247,7 +247,7 @@ class SentSplit():
         :param chars_strings: list of lines where each line consists of characters
         :param y_tags_strings: list of lines where each line consists of tags which are either 'O' or 'EOS'
         '''
-        def _check_and_add_sentence(sent: str, is_leftover: bool = False) -> bool:
+        def _check_and_add_sentence(sent: str, str_len: int, cur_ind: int, is_leftover: bool = False) -> bool:
             '''
             Check if the given `sent` can be added to `results`.
             If so, add to `results` and return `True`; otherwise, return `False`
@@ -263,10 +263,36 @@ class SentSplit():
             if len(sent) <= 0:
                 return False
             # if the no. of remaining characters are less than mincut, don't add
-            if not is_leftover and string_length - current_index <= mincut:
+            if not is_leftover and (str_len - cur_ind) <= mincut:
                 return False
             results.append(sent)
             return True
+
+        def _segment_maxcut_string(sent: str) -> str:
+            '''
+            Heuristically segment a maxcut string into two, add the first half to `results`, and return the remaining half.
+            A list of heuristic regexes are applied to `sent` in decreasing order of importance.
+            As soon as a matching is found, the sentence is segmented.
+            '''
+            rgx_punctuation_and_closing = r'(?<=[\.。︀?？!！…])[\'"’”❜❞›»❯」』)）\]］】〟]'
+            rgx_closing_and_punctuation = r'(?<=[\'"’”❜❞›»❯」』)）\]］】〟])[\.。︀?？!！…]'
+            rgx_space_and_dash = r'(?<=\s)\p{Pd}'
+            rgx_colon = r'[:﹕：;﹔；؛⁏]'
+            rgx_not_space_and_closing_and_space = r'(?<=[^\s])[\'"’”❜❞›»❯」』)）\]］】〟](?=\s)'
+            rgx_comma = r'[,，﹐]'
+            rgx_closing = r'[’”❜❞›»❯」』)）\]］】〟]'
+            rgx_whitespace = r'\s'
+            heuristics = [rgx_punctuation_and_closing, rgx_closing_and_punctuation, rgx_space_and_dash,
+                          rgx_colon, rgx_not_space_and_closing_and_space, rgx_comma, rgx_closing, rgx_whitespace]
+            for heu in heuristics:
+                for match in re.finditer(heu, sent):
+                    assert match.end() - match.start() == 1
+                    first_half = sent[:match.end()]
+                    if _check_and_add_sentence(first_half, len(sent), len(first_half)):
+                        return sent[match.end():]
+            if _check_and_add_sentence(sent, is_leftover=True):
+                return ''
+            raise RuntimeError(f"Cannot segment maxcut string: {sent}")
 
         results = []
         for char_string, tags in zip(chars_strings, y_tags_strings):
@@ -274,15 +300,14 @@ class SentSplit():
             string_length = len(char_string)
             for current_index, (current_character, tag) in enumerate(zip(char_string, tags)):
                 if len(sentence) >= maxcut:
-                    if _check_and_add_sentence(sentence):
-                        sentence = ''
+                    sentence = _segment_maxcut_string(sentence)
                 if tag == 'EOS':
                     sentence += current_character
-                    if _check_and_add_sentence(sentence):
+                    if _check_and_add_sentence(sentence, string_length, current_index):
                         sentence = ''
                 else:
                     sentence += current_character
-            if _check_and_add_sentence(sentence, is_leftover=True):
+            if _check_and_add_sentence(sentence, string_length, current_index, is_leftover=True):
                 sentence = ''
         return results
 
