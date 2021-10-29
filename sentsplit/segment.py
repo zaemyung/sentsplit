@@ -290,7 +290,7 @@ class SentSplit():
                     first_half = sent[:match.end()]
                     if _check_and_add_sentence(first_half, len(sent), len(first_half)):
                         return sent[match.end():]
-            if _check_and_add_sentence(sent, is_leftover=True):
+            if _check_and_add_sentence(sent, string_length, current_index, is_leftover=True):
                 return ''
             raise RuntimeError(f"Cannot segment maxcut string: {sent}")
 
