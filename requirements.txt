@@ -1,3 +1,4 @@
 python-crfsuite>=0.9.7
 tqdm>=4.59.0
 loguru>=0.5.3
+regex>=2021.10.23
