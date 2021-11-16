@@ -8,6 +8,8 @@ This library allows splitting of text paragraphs into sentences. It is built wit
 
 All in all, the library aims to benefit from the best of both worlds: data-driven and rule-based approaches.
 
+You can try out the library [here](https://share.streamlit.io/zaemyung/sentsplit/main).
+
 ## Installation
 Supports Python 3.6+
 
