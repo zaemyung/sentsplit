@@ -1,4 +1,4 @@
-version = '1.0.7'
+version = '1.0.8'
 description = 'A flexible sentence segmentation library using CRF model and regex rules'
 author = 'Zae Myung Kim'
 author_email = 'zaemyung@gmail.com'
