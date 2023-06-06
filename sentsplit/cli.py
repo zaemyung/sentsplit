@@ -34,14 +34,24 @@ def sentsplit_train(args: Namespace) -> None:
 
     if output_path is None:
         corpus_basename = os.path.basename(corpus_path)
-        today_str = datetime.today().strftime('%d%m%Y')
-        output_path = f'./{corpus_basename}.{lang}-{ngram}-gram-{today_str}.model'
+        today_str = datetime.today().strftime("%d%m%Y")
+        output_path = f"./{corpus_basename}.{lang}-{ngram}-gram-{today_str}.model"
 
-    train_crf_model(corpus_path, ngram, output_path, sample_min_length, crf_max_iteration, depunctuation_ratio, num_depunctuation_endings, ending_length, despace_ratio)
+    train_crf_model(
+        corpus_path,
+        ngram,
+        output_path,
+        sample_min_length,
+        crf_max_iteration,
+        depunctuation_ratio,
+        num_depunctuation_endings,
+        ending_length,
+        despace_ratio,
+    )
 
 
 def call_sentsplit_batch(line: str) -> List[str]:
-    return sentsplit.segment(line.rstrip('\n'))
+    return sentsplit.segment(line.rstrip("\n"))
 
 
 def sentsplit_segment(args: Namespace) -> None:
@@ -50,13 +60,13 @@ def sentsplit_segment(args: Namespace) -> None:
     output_file = args.output
     assert os.path.isfile(input_file)
     if output_file is None:
-        output_file = f'{input_file}.segment'
+        output_file = f"{input_file}.segment"
 
     override_options = vars(args)
-    cores = override_options['cores']
-    del override_options['cores']
+    cores = override_options["cores"]
+    del override_options["cores"]
     try:
-        default_config = deepcopy(getattr(config, '{}_config'.format(lang)))
+        default_config = deepcopy(getattr(config, "{}_config".format(lang)))
     except AttributeError:
         logger.critical(f"Unsupported language: {lang.upper()}")
         sys.exit(1)
@@ -68,12 +78,12 @@ def sentsplit_segment(args: Namespace) -> None:
     global sentsplit
     sentsplit = SentSplit(lang, **default_config)
 
-    num_lines = int(subprocess.check_output(['wc', '-l', input_file]).decode('utf8').split()[0])
-    with open(input_file, 'r') as inf, open(output_file, 'w') as outf:
+    num_lines = int(subprocess.check_output(["wc", "-l", input_file]).decode("utf8").split()[0])
+    with open(input_file, "r") as inf, open(output_file, "w") as outf:
         cnt = 0
         if cores <= 1:
             for line in tqdm(inf, total=num_lines):
-                line = line.rstrip('\n')
+                line = line.rstrip("\n")
                 segments = sentsplit.segment(line)
                 for segment in segments:
                     outf.write(f"{segment}\n")
