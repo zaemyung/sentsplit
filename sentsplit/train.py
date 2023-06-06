@@ -7,7 +7,7 @@ import pycrfsuite
 from loguru import logger
 from tqdm import tqdm
 
-from .utils import read_lines
+from sentsplit.utils import read_lines
 
 _PUNCTUATIONS = {".", "?", "!", '"', "'", "”", "．", "？", "！", "。", "…"}
 

@@ -11,9 +11,9 @@ import pycrfsuite
 import regex as re
 from loguru import logger
 
-from . import config, regexes
-from .train import _PUNCTUATIONS, _sample_to_features
-from .utils import split_keep_multiple_separators
+from sentsplit import config, regexes
+from sentsplit.train import _PUNCTUATIONS, _sample_to_features
+from sentsplit.utils import split_keep_multiple_separators
 
 
 class SentSplit:
