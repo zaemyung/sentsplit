@@ -12,6 +12,7 @@ import regex as re
 from loguru import logger
 
 from sentsplit import config, regexes
+from sentsplit.regexes import Regex
 from sentsplit.train import _PUNCTUATIONS, _sample_to_features
 from sentsplit.utils import split_keep_multiple_separators
 
@@ -183,7 +184,7 @@ class SentSplit:
 
     @staticmethod
     def _tag_segment_regexes(
-        y_tags_strings: list[list[str]], strings: list[str], segment_regexes: list[dict[str, str]]
+        y_tags_strings: list[list[str]], strings: list[str], segment_regexes: list[Regex]
     ) -> list[list[str]]:
         """
         Label either the start or end indices of the matched regex patterns with 'EOS'
@@ -205,7 +206,7 @@ class SentSplit:
     def _tag_prevent_regexes(
         y_tags_strings: list[list[str]],
         strings: list[str],
-        prevent_regexes: list[dict[str, str]],
+        prevent_regexes: list[Regex],
         maxcut: int,
         prevent_word_split: bool,
     ) -> list[list[str]]:
