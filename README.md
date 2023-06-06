@@ -11,7 +11,7 @@ All in all, the library aims to benefit from the best of both worlds: data-drive
 You can try out the library [here](https://share.streamlit.io/zaemyung/sentsplit/main).
 
 ## Installation
-Supports Python 3.6+
+Supports Python 3.7+
 
 ```bash
 # stable

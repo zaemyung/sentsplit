@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import random
 from collections import Counter
-from typing import List, Set, Tuple
 
 import pycrfsuite
 from loguru import logger
@@ -35,8 +36,8 @@ def train_crf_model(
 
 
 def _compute_top_k_depunctuated_endings(
-    lines: List[str], num_depunctuation_endings: int, ending_length: int
-) -> Set[str]:
+    lines: list[str], num_depunctuation_endings: int, ending_length: int
+) -> set[str]:
     """
     Computes the most common endings of sentences.
     Applicable only to languages that utilize specific endings
@@ -63,7 +64,7 @@ def _preprocess(
     num_depunctuation_endings: int,
     ending_length: int,
     despace_ratio: float,
-) -> List[List[Tuple[str, str]]]:
+) -> list[list[tuple[str, str]]]:
     logger.info("Preprocessing sentences..")
     assert 0.0 <= depunctuation_ratio <= 1.0
     assert 0.0 <= despace_ratio <= 1.0
@@ -110,7 +111,7 @@ def _preprocess(
     return train_samples
 
 
-def _create_features(samples: List[List[Tuple[str, str]]], ngram: int) -> Tuple[List[List[List[str]]], List[List[str]]]:
+def _create_features(samples: list[list[tuple[str, str]]], ngram: int) -> tuple[list[list[list[str]]], list[list[str]]]:
     logger.info("Creating features..")
     X = []
     y = []
@@ -120,8 +121,8 @@ def _create_features(samples: List[List[Tuple[str, str]]], ngram: int) -> Tuple[
     return X, y
 
 
-def _sample_to_features(sample: List[Tuple[str, str]], ngram: int) -> List[List[str]]:
-    def _char_to_features(i: int) -> List[str]:
+def _sample_to_features(sample: list[tuple[str, str]], ngram: int) -> list[list[str]]:
+    def _char_to_features(i: int) -> list[str]:
         char = sample[i][0]
         feats = [
             "bias",
@@ -143,13 +144,13 @@ def _sample_to_features(sample: List[Tuple[str, str]], ngram: int) -> List[List[
     return features
 
 
-def _sample_to_labels(sample: List[Tuple[str, str]]) -> List[str]:
+def _sample_to_labels(sample: list[tuple[str, str]]) -> list[str]:
     return [label for _, label in sample]
 
 
 def _fit_model(
-    X_train: List[List[List[str]]],
-    y_train: List[List[str]],
+    X_train: list[list[list[str]]],
+    y_train: list[list[str]],
     output_path: str,
     crf_max_iteration: int,
 ) -> None:

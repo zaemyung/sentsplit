@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import math
 import os
 import pprint
 from copy import deepcopy
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Optional, Union
 
 import pkg_resources
 import pycrfsuite
@@ -68,7 +70,7 @@ class SentSplit:
             if "regex" not in rgx:
                 self.config["prevent_regexes"][rgx_index] = getattr(regexes, rgx["name"])
 
-    def segment(self, string: Union[str, List], strip_spaces: Union[None, bool] = None) -> List[str]:
+    def segment(self, string: Union[str, list[str]], strip_spaces: Optional[bool] = None) -> list[str]:
         if strip_spaces is None:
             strip_spaces = self.config["strip_spaces"]
         else:
@@ -83,7 +85,7 @@ class SentSplit:
             result = [self._segment(t, strip_spaces) for t in string]
         return result
 
-    def _segment(self, original_string: str, strip_spaces: bool) -> List[str]:
+    def _segment(self, original_string: str, strip_spaces: bool) -> list[str]:
         """This method deals with a single string"""
         # initially segment by line feeds
         strings = split_keep_multiple_separators(original_string, ["\n"])
@@ -138,7 +140,7 @@ class SentSplit:
         return results
 
     @staticmethod
-    def _substitute_multiple_spaces(line: str) -> Tuple[str, List[Tuple[int, int]]]:
+    def _substitute_multiple_spaces(line: str) -> tuple[str, list[tuple[int, int]]]:
         """
         Substitute multiple spaces with a single space and record their indices so that they can be restored later
         multiple_spaces_positions: [(start_ind, end_ind), ..]
@@ -151,9 +153,9 @@ class SentSplit:
 
     @staticmethod
     def _adjust_tags_for_multiple_spaces(
-        y_tags_strings: List[List[str]],
-        multiple_spaces_positions_strings: List[List[Tuple[int, int]]],
-    ) -> List[List[str]]:
+        y_tags_strings: list[list[str]],
+        multiple_spaces_positions_strings: list[list[tuple[int, int]]],
+    ) -> list[list[str]]:
         """
         So far y_tags_strings contains labels (tags) for the multiple-space-substituted strings
         This method adds back (`len_matched_spaces` - 1) 'O' tags after the substituted single space to restore original strings
@@ -181,8 +183,8 @@ class SentSplit:
 
     @staticmethod
     def _tag_segment_regexes(
-        y_tags_strings: List[List[str]], strings: List[str], segment_regexes: List[Dict]
-    ) -> List[List[str]]:
+        y_tags_strings: list[list[str]], strings: list[str], segment_regexes: list[dict[str, str]]
+    ) -> list[list[str]]:
         """
         Label either the start or end indices of the matched regex patterns with 'EOS'
         @param segment_regexes: [{'regex': '<pattern>', 'at': <'end' or 'start'>}, ..]
@@ -201,19 +203,19 @@ class SentSplit:
 
     @staticmethod
     def _tag_prevent_regexes(
-        y_tags_strings: List[List[str]],
-        strings: List[str],
-        prevent_regexes: List[Dict],
+        y_tags_strings: list[list[str]],
+        strings: list[str],
+        prevent_regexes: list[dict[str, str]],
         maxcut: int,
         prevent_word_split: bool,
-    ) -> List[List[str]]:
+    ) -> list[list[str]]:
         """
         Remove 'EOS' label for characters that are matched by prevent_regexes
         and prevent these characters from being cut due to maxcut
         @param prevent_regexes: [{'regex': '<pattern>'}, ..]
         """
 
-        def _tag_prevent_word_split(y_tags: List[str], curr_string: str) -> List[str]:
+        def _tag_prevent_word_split(y_tags: list[str], curr_string: str) -> list[str]:
             """Prevent segmentation occurring in the middle of a word"""
             assert isinstance(curr_string, str)
             for i, tag in enumerate(y_tags[:-1]):
@@ -224,7 +226,7 @@ class SentSplit:
                     y_tags[i] = "O"
             return y_tags
 
-        def _get_last_segmented_index(labels: List[str], pivot: int) -> int:
+        def _get_last_segmented_index(labels: list[str], pivot: int) -> int:
             """Return the closest previously cut index to pivot"""
             if pivot < 1:
                 return -1
@@ -267,12 +269,12 @@ class SentSplit:
 
     @staticmethod
     def _segment_by_char_tag(
-        chars_strings: List[List[str]],
-        y_tags_strings: List[List[str]],
+        chars_strings: list[list[str]],
+        y_tags_strings: list[list[str]],
         strip_spaces: bool,
         maxcut: int,
         mincut: int,
-    ) -> List[str]:
+    ) -> list[str]:
         """
         Loop through character-level tags and segment when 'EOS' and other conditions are met
         :param chars_strings: list of lines where each line consists of characters

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import pprint
 import subprocess
@@ -6,7 +8,6 @@ from argparse import Namespace
 from copy import deepcopy
 from datetime import datetime
 from multiprocessing import Pool
-from typing import List
 
 from loguru import logger
 from tqdm import tqdm
@@ -50,7 +51,7 @@ def sentsplit_train(args: Namespace) -> None:
     )
 
 
-def call_sentsplit_batch(line: str) -> List[str]:
+def call_sentsplit_batch(line: str) -> list[str]:
     return sentsplit.segment(line.rstrip("\n"))
 
 

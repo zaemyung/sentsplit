@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 from functools import reduce
-from typing import List
 
 import regex as re
 
 
-def read_lines(file_path: str) -> List[str]:
+def read_lines(file_path: str) -> list[str]:
     lines = []
     with open(file_path, "r") as inf:
         for line in inf:
@@ -12,13 +13,13 @@ def read_lines(file_path: str) -> List[str]:
     return lines
 
 
-def write_lines(lines: List[str], file_path: str) -> None:
+def write_lines(lines: list[str], file_path: str) -> None:
     with open(file_path, "w") as outf:
         for line in lines:
             outf.write(f"{line}\n")
 
 
-def split_keep_multiple_separators(string: str, separators: List[str]) -> List[str]:
+def split_keep_multiple_separators(string: str, separators: list[str]) -> list[str]:
     """
     Split `string` on separator(s) but also keep the separator(s)
     Modified from `http://programmaticallyspeaking.com/split-on-separator-but-keep-the-separator-in-python.html`
