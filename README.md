@@ -11,7 +11,7 @@ All in all, the library aims to benefit from the best of both worlds: data-drive
 You can try out the library [here](https://share.streamlit.io/zaemyung/sentsplit/main).
 
 ## Installation
-Supports Python 3.6+
+Supports Python 3.7+
 
 ```bash
 # stable
@@ -52,7 +52,7 @@ sentences = sent_splitter.segment([lines])
 ## Features
 The behavior of segmentation can be adjusted by the following arguments:
 - `mincut`: a line is not segmented if its character-level length is smaller than `mincut`, preventing too short sentences.
-- `maxcut`: a line is segmented if its character-level length is greater or equal to `maxcut`, preventing too long sentences.
+- `maxcut`: a line is ["heuristically"](https://github.com/zaemyung/sentsplit/blob/cce34e1ed372b6a79c739f42334c775581fc0de8/sentsplit/segment.py#L271) segmented if its character-level length is greater or equal to `maxcut`, preventing too long sentences.
 - `strip_spaces`: trim any white spaces in front and end of a sentence; does not guarantee exact reconstruction of original passages.
 - `handle_multiple_spaces`: substitute multiple spaces with a single space, perform segmentation, and recover the original spaces.
 - `segment_regexes`: segment at either `start` or `end` index of the matched group defined by the regex patterns.
