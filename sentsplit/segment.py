@@ -341,7 +341,7 @@ class SentSplit:
         for char_string, tags in zip(chars_strings, y_tags_strings):
             sentence = ""
             string_length = len(char_string)
-            if string_length < 1:
+            if string_length < 1 and len(char_string) > 0:
                 results.append(char_string)
                 continue
             for current_index, (current_character, tag) in enumerate(zip(char_string, tags)):
