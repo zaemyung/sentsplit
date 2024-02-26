@@ -107,3 +107,15 @@ def test_segment_tr():
         "Bu bir test cümlesi.",
         " İşte başka bir tane.",
     ]
+
+
+def test_segment_edge_cases():
+    splitter = SentSplit("en")
+
+    assert splitter.segment("This\n") == [
+        "This\n"
+    ]
+
+    assert splitter.segment("This is a test sentence.\n\n And here's another one.\n") == [
+        "This is a test sentence.\n", "\n", " And here's another one.\n"
+    ]
