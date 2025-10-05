@@ -3,10 +3,14 @@ from __future__ import annotations
 import math
 import os
 import pprint
+from pathlib import Path 
 from copy import deepcopy
 from typing import Any, Optional, Union
 
-import pkg_resources
+# Removed
+# import pkg_resources
+# Reason: deprecation warnings
+
 import pycrfsuite
 import regex as re
 from loguru import logger
@@ -18,36 +22,78 @@ from sentsplit.utils import split_keep_multiple_separators
 
 
 class SentSplit:
+    """Sentence segmentation using CRF models with configurable rules.
+    
+    Supports multiple languages with built-in models or custom trained models
+    for unsupported languages.
+    """
     def __init__(self, lang: str, **kwargs: Any) -> None:
+        """Initialize SentSplit for a given language.
+    
+        :param lang: ISO language code (e.g., 'en', 'fr', 'ko') or custom language
+        :param kwargs: Configuration overrides including 'model' path for custom models
+        
+        :raises FileNotFoundError: If model file does not exist
+        :raises ValueError: If required parameters are missing
+        """
         self.lang = lang
+    
+        # Step 1: Get appropriate config and is_builtin_model
         try:
             default_config = deepcopy(getattr(config, f"{self.lang}_config"))
+            is_builtin_model = True
         except AttributeError:
-            logger.critical(f"Unsupported language: {self.lang.upper()}")
-            logger.info(f"Falling back to the `base_config`. Need to provide `model` path.")
             default_config = deepcopy(getattr(config, "base_config"))
-
-        # override config arguments
+            is_builtin_model = False
+            
+        # Step 2: Extract model path if explicitly provided
+        model_path = None
+        if 'model' in kwargs:
+            model_path = Path(str(kwargs.pop('model')))
+        elif 'model' in default_config and default_config['model']:
+            model_path = Path(str(default_config["model"]))
+        else:
+            raise ValueError(
+                "Model path is required. "
+                "For unsupported languages, provide 'model' parameter. "
+            )
+            
+        # Step 3: Override config arguments (excluding model since we handled it above)
         for k, v in kwargs.items():
-            if k not in default_config:
+            if k not in default_config and k != "model":
                 logger.warning(f"`{k}` not in config, skipped")
                 continue
             default_config[k] = v
 
-        self.config = default_config
-
-        # load tagger
-        model_path = self.config["model"]
-        if not os.path.isfile(model_path):
-            model_path = pkg_resources.resource_filename("sentsplit", model_path)
-        self.tagger = SentSplit._load_model(model_path)
-
-        # fill regexes
+        self.config = default_config    
+        
+        # Step 4: Validate model path
+        if is_builtin_model:
+            # Built-in model - resolve relative to package directory
+            package_root = Path(__file__).parent
+            model_path = package_root / model_path
+            
+            if model_path.is_file():
+                self.config["model"] = str(model_path) # Convert it to str if it is Path object
+            else:
+                raise FileNotFoundError(f"Built-in model not found: {model_path}")
+        else:
+            if model_path.is_file():
+                self.config["model"] = str(model_path)
+                logger.info(f"Using custom model: {model_path}")
+            else:
+                raise FileNotFoundError(f"Model file not found: {model_path}")
+                
+            
+        # Load tagger
+        self.tagger = self._load_model(self.config["model"])
+       
+       # Fill regexes
         self._fill_regexes()
-
+    
         config_string = pprint.pformat(self.config, indent=2)
         logger.info(f"SentSplit for {self.lang.upper()} loaded:\n{config_string}")
-
+        
     def __enter__(self):
         return self
 
