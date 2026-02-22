@@ -141,3 +141,15 @@ We can either train a new CRF model with more gold sentences from the target dom
 
 ## License
 `sentsplit` is licensed under MIT license, as found in [LICENSE](https://github.com/zaemyung/sentsplit/blob/main/LICENSE) file.
+
+## Citation
+```bibtex
+@software{kim_sentsplit,
+  author       = {Kim, Zae Myung},
+  title        = {sentsplit: A flexible sentence segmentation library using CRF model and regex rules},
+  year         = {2024},
+  url          = {https://github.com/zaemyung/sentsplit},
+  version      = {1.0.8},
+  license      = {MIT}
+}
+```
