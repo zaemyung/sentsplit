@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "sentsplit: A flexible sentence segmentation library using CRF model and regex rules"
+type: software
+authors:
+  - family-names: Kim
+    given-names: Zae Myung
+    alias: zaemyung
+url: "https://github.com/zaemyung/sentsplit"
+repository-code: "https://github.com/zaemyung/sentsplit"
+license: MIT
+version: 1.0.8
+date-released: 2024-02-26
+keywords:
+  - natural-language-processing
+  - sentence-segmentation
+  - sentence-boundary-detection
+  - sentence-splitting
+abstract: >-
+  A flexible sentence segmentation library using CRF model and regex rules.
+  It allows splitting of text paragraphs into sentences by combining
+  data-driven (conditional random field) and rule-based (regular expression)
+  approaches, with support for multiple languages.
