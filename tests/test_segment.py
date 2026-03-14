@@ -5,38 +5,37 @@ from unittest.mock import patch
 from sentsplit.segment import SentSplit
 
 
-class TestUnsupportedLanguageInitialization:
-    """Tests for SentSplit initialization with unsupported languages and custom models."""
+def test_no_model_raises_value_error():
+    """Unsupported language without model should raise ValueError."""
+    with pytest.raises(ValueError, match="Model path is required"):
+        SentSplit("ht")  # Haitian Creole - unsupported language
 
-    def test_no_model_raises_value_error(self):
-        """Unsupported language without model should raise ValueError."""
-        with pytest.raises(ValueError, match="Model path is required"):
-            SentSplit("ht")  # Haitian Creole - unsupported language
 
-    def test_nonexistent_model_raises_file_not_found(self):
-        """Unsupported language with non-existent model should raise FileNotFoundError."""
-        with pytest.raises(FileNotFoundError, match="Model file not found"):
-            SentSplit("ht", model="/nonexistent/path/model.model")
+def test_nonexistent_model_raises_file_not_found():
+    """Unsupported language with non-existent model should raise FileNotFoundError."""
+    with pytest.raises(FileNotFoundError, match="Model file not found"):
+        SentSplit("ht", model="/nonexistent/path/model.model")
 
-    def test_valid_custom_model_initializes(self):
-        """Unsupported language with valid custom model should initialize successfully."""
-        with tempfile.NamedTemporaryFile(suffix='.model', delete=False) as tmp_model:
-            tmp_model.write(b'CRFSuite model file v0.1\n')  # Minimal CRFSuite header
-            tmp_model_path = tmp_model.name
 
-        try:
-            with patch.object(SentSplit, '_load_model') as mock_load:
-                mock_load.return_value = "mock_tagger"
+def test_valid_custom_model_initializes():
+    """Unsupported language with valid custom model should initialize successfully."""
+    with tempfile.NamedTemporaryFile(suffix='.model', delete=False) as tmp_model:
+        tmp_model.write(b'CRFSuite model file v0.1\n')  # Minimal CRFSuite header
+        tmp_model_path = tmp_model.name
 
-                splitter = SentSplit("ht", model=tmp_model_path)
+    try:
+        with patch.object(SentSplit, '_load_model') as mock_load:
+            mock_load.return_value = "mock_tagger"
 
-                assert splitter.lang == "ht"
-                assert splitter.tagger == "mock_tagger"
-                assert splitter.config["model"] == tmp_model_path
-                mock_load.assert_called_once_with(tmp_model_path)
-        finally:
-            if os.path.exists(tmp_model_path):
-                os.unlink(tmp_model_path)
+            splitter = SentSplit("ht", model=tmp_model_path)
+
+            assert splitter.lang == "ht"
+            assert splitter.tagger == "mock_tagger"
+            assert splitter.config["model"] == tmp_model_path
+            mock_load.assert_called_once_with(tmp_model_path)
+    finally:
+        if os.path.exists(tmp_model_path):
+            os.unlink(tmp_model_path)
 
 
 def test_segment_en():
