@@ -25,10 +25,13 @@ def split_keep_multiple_separators(string: str, separators: list[str]) -> list[s
     Modified from `http://programmaticallyspeaking.com/split-on-separator-but-keep-the-separator-in-python.html`
     to extend to multiple separators.
     """
-    rgx_multiple_separators = "|".join([re.escape(sep) for sep in separators])
-    rgx_multiple_separators = "(" + rgx_multiple_separators + ")"
-    return reduce(
-        lambda acc, elem: acc[:-1] + [acc[-1] + elem] if (elem in separators) else acc + [elem],
-        re.split(rgx_multiple_separators, string),
-        [],
-    )
+    rgx_multiple_separators = "(" + "|".join([re.escape(sep) for sep in separators]) + ")"
+    
+    sentences = []
+    for elem in re.split(rgx_multiple_separators, string):
+        if elem in separators:
+            sentences[-1] += elem
+            continue
+        sentences.append(elem)
+
+    return sentences
