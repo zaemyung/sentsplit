@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from functools import reduce
-
 import regex as re
 
 
 def read_lines(file_path: str) -> list[str]:
     lines = []
-    with open(file_path, "r") as inf:
+    with open(file_path) as inf:
         for line in inf:
             lines.append(line.rstrip("\n"))
     return lines
@@ -26,12 +24,14 @@ def split_keep_multiple_separators(string: str, separators: list[str]) -> list[s
     to extend to multiple separators.
     """
     rgx_multiple_separators = "(" + "|".join([re.escape(sep) for sep in separators]) + ")"
-    
-    sentences = []
-    for elem in re.split(rgx_multiple_separators, string):
-        if elem in separators:
-            sentences[-1] += elem
+
+    parts = re.split(rgx_multiple_separators, string)
+    sentences = [parts[0]]
+
+    for part in parts[1:]:
+        if part in separators:
+            sentences[-1] += part
             continue
-        sentences.append(elem)
+        sentences.append(part)
 
     return sentences
