@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+
 from typing_extensions import NotRequired, TypedDict
 
 from sentsplit.regexes import Regex

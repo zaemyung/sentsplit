@@ -67,7 +67,7 @@ def sentsplit_segment(args: Namespace) -> None:
     cores = override_options["cores"]
     del override_options["cores"]
     try:
-        default_config = deepcopy(getattr(config, "{}_config".format(lang)))
+        default_config = deepcopy(getattr(config, f"{lang}_config"))
     except AttributeError:
         logger.critical(f"Unsupported language: {lang.upper()}")
         sys.exit(1)
@@ -80,7 +80,7 @@ def sentsplit_segment(args: Namespace) -> None:
     sentsplit = SentSplit(lang, **default_config)
 
     num_lines = int(subprocess.check_output(["wc", "-l", input_file]).decode("utf8").split()[0])
-    with open(input_file, "r") as inf, open(output_file, "w") as outf:
+    with open(input_file) as inf, open(output_file, "w") as outf:
         cnt = 0
         if cores <= 1:
             for line in tqdm(inf, total=num_lines):

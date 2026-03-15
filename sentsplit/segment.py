@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import math
-import os
 import pprint
-from pathlib import Path 
 from copy import deepcopy
-from typing import Any, Optional, Union
+from pathlib import Path
+from typing import Any, Union
 
 import pycrfsuite
 import regex as re
@@ -19,21 +18,22 @@ from sentsplit.utils import split_keep_multiple_separators
 
 class SentSplit:
     """Sentence segmentation using CRF models with configurable rules.
-    
+
     Supports multiple languages with built-in models or custom trained models
     for unsupported languages.
     """
+
     def __init__(self, lang: str, **kwargs: Any) -> None:
         """Initialize SentSplit for a given language.
-    
+
         :param lang: ISO language code (e.g., 'en', 'fr', 'ko') or custom language
         :param kwargs: Configuration overrides including 'model' path for custom models
-        
+
         :raises FileNotFoundError: If model file does not exist
         :raises ValueError: If required parameters are missing
         """
         self.lang = lang
-    
+
         # Get appropriate config and is_builtin_model
         try:
             default_config = deepcopy(getattr(config, f"{self.lang}_config"))
@@ -41,19 +41,16 @@ class SentSplit:
         except AttributeError:
             default_config = deepcopy(getattr(config, "base_config"))
             is_builtin_model = False
-            
+
         # Extract model path if explicitly provided
         model_path = None
-        if 'model' in kwargs:
-            model_path = Path(str(kwargs.pop('model')))
-        elif 'model' in default_config and default_config['model']:
+        if "model" in kwargs:
+            model_path = Path(str(kwargs.pop("model")))
+        elif "model" in default_config and default_config["model"]:
             model_path = Path(str(default_config["model"]))
         else:
-            raise ValueError(
-                "Model path is required. "
-                "For unsupported languages, provide 'model' parameter. "
-            )
-            
+            raise ValueError("Model path is required. For unsupported languages, provide 'model' parameter. ")
+
         # Override config arguments (excluding model since we handled it above)
         for k, v in kwargs.items():
             if k not in default_config and k != "model":
@@ -61,16 +58,16 @@ class SentSplit:
                 continue
             default_config[k] = v
 
-        self.config = default_config    
-        
+        self.config = default_config
+
         # Validate model path
         if is_builtin_model:
             # Built-in model - resolve relative to package directory
             package_root = Path(__file__).parent
             model_path = package_root / model_path
-            
+
             if model_path.is_file():
-                self.config["model"] = str(model_path) # Convert it to str if it is Path object
+                self.config["model"] = str(model_path)  # Convert it to str if it is Path object
             else:
                 raise FileNotFoundError(f"Built-in model not found: {model_path}")
         else:
@@ -79,17 +76,16 @@ class SentSplit:
                 logger.info(f"Using custom model: {model_path}")
             else:
                 raise FileNotFoundError(f"Model file not found: {model_path}")
-                
-            
+
         # Load tagger
         self.tagger = self._load_model(self.config["model"])
-       
+
         # Fill regexes
         self._fill_regexes()
-    
+
         config_string = pprint.pformat(self.config, indent=2)
         logger.info(f"SentSplit for {self.lang.upper()} loaded:\n{config_string}")
-        
+
     def __enter__(self):
         return self
 
@@ -113,7 +109,7 @@ class SentSplit:
             if "regex" not in rgx:
                 self.config["prevent_regexes"][rgx_index] = getattr(regexes, rgx["name"])
 
-    def segment(self, input: Union[str, list[str]], strip_spaces: Optional[bool] = None) -> list[str]:
+    def segment(self, input: Union[str, list[str]], strip_spaces: bool | None = None) -> list[str]:
         if strip_spaces is None:
             strip_spaces = self.config["strip_spaces"]
         else:
@@ -131,9 +127,9 @@ class SentSplit:
         # initially segment by line feeds
         strings = split_keep_multiple_separators(original_string, ["\n"])
 
-        char_lists = []   # list of original characters per string
+        char_lists = []  # list of original characters per string
         features_strings = []  # list of character n-gram features per string
-        multiple_spaces_position_lists = [] # list of tuples(match, start_ind, end_ind) per string
+        multiple_spaces_position_lists = []  # list of tuples(match, start_ind, end_ind) per string
 
         for string in strings:
             char_lists.append([c for c in string])
@@ -155,9 +151,7 @@ class SentSplit:
 
         if self.config["handle_multiple_spaces"]:
             # adjust y_tags_strings to account for the removed multiple spaces
-            y_tags_strings = SentSplit._adjust_tags_for_multiple_spaces(
-                y_tags_strings, multiple_spaces_position_lists
-            )
+            y_tags_strings = SentSplit._adjust_tags_for_multiple_spaces(y_tags_strings, multiple_spaces_position_lists)
 
         y_tags_strings = SentSplit._tag_segment_regexes(y_tags_strings, strings, self.config["segment_regexes"])
         y_tags_strings = SentSplit._tag_prevent_regexes(
@@ -190,7 +184,7 @@ class SentSplit:
 
         # Perform the substitution in one pass while recording positions
         new_line = re.sub(r"\s{2,}", repl, line)
-    
+
         return new_line, positions
 
     @staticmethod
