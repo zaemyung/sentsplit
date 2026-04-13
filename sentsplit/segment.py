@@ -109,17 +109,17 @@ class SentSplit:
             if "regex" not in rgx:
                 self.config["prevent_regexes"][rgx_index] = getattr(regexes, rgx["name"])
 
-    def segment(self, input: Union[str, list[str]], strip_spaces: bool | None = None) -> list[str]:
+    def segment(self, string: Union[str, list[str]], strip_spaces: bool | None = None) -> list[str]:
         if strip_spaces is None:
             strip_spaces = self.config["strip_spaces"]
         else:
             assert isinstance(strip_spaces, bool), "`strip_spaces` must be a boolean value"
 
-        if isinstance(input, str):
-            result = self._segment(input, strip_spaces)
+        if isinstance(string, str):
+            result = self._segment(string, strip_spaces)
         else:
-            assert isinstance(input, list)
-            result = [self._segment(t, strip_spaces) for t in input]
+            assert isinstance(string, list)
+            result = [self._segment(t, strip_spaces) for t in string]
         return result
 
     def _segment(self, original_string: str, strip_spaces: bool) -> list[str]:
@@ -127,19 +127,19 @@ class SentSplit:
         # initially segment by line feeds
         strings = split_keep_multiple_separators(original_string, ["\n"])
 
-        char_lists = []  # list of original characters per string
+        chars_strings = []  # list of original characters per string
         features_strings = []  # list of character n-gram features per string
-        multiple_spaces_position_lists = []  # list of tuples(match, start_ind, end_ind) per string
+        multiple_spaces_positions_strings = []  # list of tuples(match, start_ind, end_ind) per string
 
         for string in strings:
-            char_lists.append([c for c in string])
+            chars_strings.append([c for c in string])
             if self.config["handle_multiple_spaces"]:
                 # replace multiple spaces with a single space for better segmentation by CRF model
                 (
                     preprocessed_string,
                     multiple_spaces_positions,
                 ) = SentSplit._substitute_multiple_spaces(string)
-                multiple_spaces_position_lists.append(multiple_spaces_positions)
+                multiple_spaces_positions_strings.append(multiple_spaces_positions)
                 # convert the string into character n-gram features
                 features_strings.append(_sample_to_features([c for c in preprocessed_string], self.config["ngram"]))
             else:
@@ -151,7 +151,7 @@ class SentSplit:
 
         if self.config["handle_multiple_spaces"]:
             # adjust y_tags_strings to account for the removed multiple spaces
-            y_tags_strings = SentSplit._adjust_tags_for_multiple_spaces(y_tags_strings, multiple_spaces_position_lists)
+            y_tags_strings = SentSplit._adjust_tags_for_multiple_spaces(y_tags_strings, multiple_spaces_positions_strings)
 
         y_tags_strings = SentSplit._tag_segment_regexes(y_tags_strings, strings, self.config["segment_regexes"])
         y_tags_strings = SentSplit._tag_prevent_regexes(
@@ -162,7 +162,7 @@ class SentSplit:
             self.config["prevent_word_split"],
         )
         results = SentSplit._segment_by_char_tag(
-            char_lists,
+            chars_strings,
             y_tags_strings,
             strip_spaces,
             self.config["maxcut"],
@@ -190,7 +190,7 @@ class SentSplit:
     @staticmethod
     def _adjust_tags_for_multiple_spaces(
         y_tags_strings: list[list[str]],
-        multiple_spaces_position_lists: list[list[tuple[int, int]]],
+        multiple_spaces_positions_strings: list[list[tuple[int, int]]],
     ) -> list[list[str]]:
         """
         So far y_tags_strings contains labels (tags) for the multiple-space-substituted strings
@@ -205,8 +205,8 @@ class SentSplit:
                 (Restores the three spaces after '~ good.'
                 y_tags_string: ['O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'EOS', 'O', 'O', 'O', 'O','O']
         """
-        assert len(y_tags_strings) == len(multiple_spaces_position_lists)
-        for string_index, multiple_spaces_positions in enumerate(multiple_spaces_position_lists):
+        assert len(y_tags_strings) == len(multiple_spaces_positions_strings)
+        for string_index, multiple_spaces_positions in enumerate(multiple_spaces_positions_strings):
             y_tags = y_tags_strings[string_index]
             for start_char_ind, end_char_ind in multiple_spaces_positions:
                 len_matched_spaces = end_char_ind - start_char_ind
@@ -305,7 +305,7 @@ class SentSplit:
 
     @staticmethod
     def _segment_by_char_tag(
-        char_lists: list[list[str]],
+        chars_strings: list[list[str]],
         y_tags_strings: list[list[str]],
         strip_spaces: bool,
         maxcut: int,
@@ -313,7 +313,7 @@ class SentSplit:
     ) -> list[str]:
         """
         Loop through character-level tags and segment when 'EOS' and other conditions are met
-        :param char_lists: list of lines where each line consists of characters
+        :param chars_strings: list of lines where each line consists of characters
         :param y_tags_strings: list of lines where each line consists of tags which are either 'O' or 'EOS'
         """
 
@@ -373,7 +373,7 @@ class SentSplit:
             raise RuntimeError(f"Cannot segment maxcut string: {sent}")
 
         results = []
-        for char_string, tags in zip(char_lists, y_tags_strings):
+        for char_string, tags in zip(chars_strings, y_tags_strings):
             sentence = ""
             string_length = len(char_string)
             if string_length < 1 and len(char_string) > 0:
