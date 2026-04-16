@@ -7,17 +7,13 @@ class Regex(TypedDict, total=False):
     at: str
 
 
-"""
-`segment_regexes`: make sure a string is segmented at either the start or end of the matching group(s)
-"""
+# `segment_regexes`: make sure a string is segmented at either the start or end of the matching group(s)
 newline = Regex(name="newline", regex=r"\n", at="end")
 ellipsis = Regex(name="ellipsis", regex=r"…(?![\!\?\.．？！])", at="end")
 after_semicolon = Regex(name="after_semicolon", regex=r" *;", at="end")
 
 
-"""
-`prevent_regexes`: make sure a string is not segmented at characters that fall within the matching group(s)
-"""
+# `prevent_regexes`: make sure a string is not segmented at characters that fall within the matching group(s)
 liberal_url = Regex(
     name="liberal_url",
     # ref. https://gist.github.com/gruber/249502#gistcomment-1328838
