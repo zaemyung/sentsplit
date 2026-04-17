@@ -1,10 +1,15 @@
 import argparse
 import json
+from importlib.metadata import PackageNotFoundError, version
 
 import sentsplit.cli
-import sentsplit.meta_data
 import sentsplit.segment
 import sentsplit.train
+
+try:
+    __version__ = version("sentsplit")
+except PackageNotFoundError:  # pragma: no cover
+    __version__ = "0.0.0"
 
 
 def str_to_bool(v):
