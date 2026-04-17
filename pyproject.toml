@@ -8,7 +8,7 @@ authors = [
 
 license = "MIT"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
   
 classifiers = [
   "Development Status :: 5 - Production/Stable",
@@ -33,8 +33,9 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-  "pytest>=8.3.5",
-  "ruff>=0.14.10",
+  "pytest>=8.3.4",
+  "ruff>=0.15",
+  "pytest-cov>=6.0",
 ]
 
 [project.urls]
@@ -47,12 +48,17 @@ sentsplit = "sentsplit:main"
 [build-system]
 requires = [
     "setuptools>=42",
-    "wheel"
+    "wheel",
 ]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages=["sentsplit", "sentsplit.crf_models"]
+packages = ["sentsplit", "sentsplit.crf_models"]
+
+[tool.pytest.ini_options]
+addopts = "--cov=sentsplit --cov-report=term-missing:skip-covered --durations=10"
+testpaths = ["tests"]
+python_files = "test_*.py"
 
 [tool.ruff]
 line-length = 120

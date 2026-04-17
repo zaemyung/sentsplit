@@ -3,7 +3,6 @@ import json
 from importlib.metadata import PackageNotFoundError, version
 
 import sentsplit.cli
-import sentsplit.meta_data
 import sentsplit.segment
 import sentsplit.train
 
