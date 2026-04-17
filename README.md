@@ -11,7 +11,11 @@ All in all, the library aims to benefit from the best of both worlds: data-drive
 You can try out the library [here](https://share.streamlit.io/zaemyung/sentsplit/main).
 
 ## Installation
-Supports Python 3.7+
+
+Python 3.9+ is required
+
+> [!NOTE]
+> Versions 3.7-3.8 are supported in <=v1.0.8
 
 ```bash
 # stable
@@ -19,6 +23,11 @@ pip install sentsplit
 
 # bleeding-edge
 pip install git+https://github.com/zaemyung/sentsplit
+
+# development
+git clone https://github.com/zaemyung/sentsplit
+cd sentsplit
+uv pip install -e ".[dev]"  # or pip install -e ".[dev]"
 ```
 
 Uses [python-crfsuite](https://github.com/scrapinghub/python-crfsuite), which, in turn, is built upon [CRFsuite](https://github.com/chokkan/crfsuite).
