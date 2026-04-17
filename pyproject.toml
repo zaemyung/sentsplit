@@ -1,9 +1,58 @@
+[project]
+name = "sentsplit"
+version = "1.0.8"
+description = "A flexible sentence segmentation library using CRF model and regex rules"
+authors = [
+    {name = "Zae Myung Kim", email = "zaemyung@gmail.com"}
+]
+
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.7"
+  
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Information Technology",
+  "Operating System :: OS Independent",
+  "Topic :: Text Processing",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Libraries :: Python Modules"
+]
+
+keywords = ["natural-language-processing", "sentence-segmentation", "sentence-splitter", "sentence-boundary-detection", "sentence-splitting", "NLP", "text-processing", "tokenization"]
+
+dependencies = [
+  "python-crfsuite>=0.9.7",
+  "tqdm>=4.59.0",
+  "loguru>=0.5.3",
+  "regex>=2024.4.16",
+  "typing-extensions",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3.5",
+  "ruff>=0.14.10",
+]
+
+[project.urls]
+homepage = "https://github.com/zaemyung/sentsplit"
+Issues = "https://github.com/zaemyung/sentsplit/issues"
+
+[project.scripts]
+sentsplit = "sentsplit:main"
+
 [build-system]
 requires = [
     "setuptools>=42",
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages=["sentsplit", "sentsplit.crf_models"]
 
 [tool.ruff]
 line-length = 120
